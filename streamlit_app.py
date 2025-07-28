@@ -5,6 +5,7 @@ from PIL import Image
 import base64
 import os
 import glob
+import re
 
 
 def main():
@@ -15,7 +16,6 @@ def main():
     font_color = "#ffffff"
     footer_color = "#aaaaaa"
 
-    # Inject CSS animation and styles
     st.markdown(f"""
         <style>
             html, body, [class*="css"]  {{
@@ -87,8 +87,15 @@ def main():
             st.session_state["apply_downloads"] = True
 
         if st.session_state.get("apply_downloads"):
-            pattern = os.path.join(st.session_state["last_download_dir"], "Scan-2621196-*.csv")
-            matching_files = sorted(glob.glob(pattern), reverse=True)
+            files = os.listdir(st.session_state["last_download_dir"])
+            matching_files = sorted(
+                [
+                    os.path.join(st.session_state["last_download_dir"], f)
+                    for f in files
+                    if re.match(r"^Scan-2621196-\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2}\\.csv$", f)
+                ],
+                reverse=True
+            )
             if matching_files:
                 scan_data_file = matching_files[0]
                 st.success(f"Using: {os.path.basename(scan_data_file)}")
