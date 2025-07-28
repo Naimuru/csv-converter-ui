@@ -30,8 +30,9 @@ def main():
                 background-color: #4CAF50;
                 color: white;
                 border-radius: 8px;
-                padding: 10px 20px;
+                padding: 6px 14px;
                 font-weight: bold;
+                font-size: 0.85rem;
                 animation: pulse 1.5s infinite;
             }}
             @keyframes fadeInDown {{
@@ -69,17 +70,21 @@ def main():
 
     if use_latest_file:
         if "last_download_dir" not in st.session_state:
-            st.session_state["last_download_dir"] = "/app/downloads"
+            st.session_state["last_download_dir"] = os.path.expanduser("~/Downloads")
 
         download_dir = st.text_input("Path to your Downloads folder", value=st.session_state["last_download_dir"])
-        if st.button("Apply Downloads Folder Path"):
-            pattern = os.path.join(download_dir, "Scan-2621196-*.csv")
-            matching_files = sorted(glob.glob(pattern), reverse=True)
-            if matching_files:
-                scan_data_file = matching_files[0]
-                st.session_state["last_download_dir"] = download_dir
-            else:
-                st.warning("No matching Scan Report file found in the specified Downloads folder.")
+
+        apply_clicked = st.button("Apply Downloads Folder Path")
+        if apply_clicked:
+            st.session_state["last_download_dir"] = download_dir
+
+        pattern = os.path.join(st.session_state["last_download_dir"], "Scan-2621196-*.csv")
+        matching_files = sorted(glob.glob(pattern), reverse=True)
+        if matching_files:
+            scan_data_file = matching_files[0]
+            st.success(f"Using: {os.path.basename(scan_data_file)}")
+        else:
+            st.warning("No matching Scan Report file found in the specified Downloads folder.")
     else:
         uploaded_file = st.file_uploader("Upload Scan Report CSV (with org_id)", type="csv")
         if uploaded_file is not None:
