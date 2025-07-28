@@ -10,7 +10,6 @@ import glob
 def main():
     st.set_page_config(page_title="Org ID to Name CSV Converter", page_icon="📄", layout="centered")
 
-    # Theme colors fixed to dark mode
     bg_color = "#1e1e2f"
     font_color = "#ffffff"
     footer_color = "#aaaaaa"
@@ -75,10 +74,10 @@ def main():
     use_latest_file = st.checkbox("Use latest downloaded Scan Report")
     scan_data_file = None
 
+    download_dir = os.path.expanduser("~/Downloads")
     if use_latest_file:
-        download_dir = st.text_input("Path to your Downloads folder", value=os.path.expanduser("~/Downloads"))
-        apply_button = st.button("Apply Downloads Folder Path")
-        if apply_button:
+        download_dir = st.text_input("Path to your Downloads folder", value=download_dir)
+        if os.path.exists(download_dir):
             pattern = os.path.join(download_dir, "Scan-2621196-*.csv")
             matching_files = sorted(glob.glob(pattern), reverse=True)
             if matching_files:
@@ -86,6 +85,8 @@ def main():
                 st.success(f"Using: {os.path.basename(scan_data_file)}")
             else:
                 st.warning("No matching Scan Report file found in the specified Downloads folder.")
+        else:
+            st.warning("Specified Downloads folder path does not exist.")
     else:
         uploaded_file = st.file_uploader("Upload Scan Report CSV (with org_id)", type="csv")
         if uploaded_file is not None:
