@@ -1,11 +1,10 @@
+# streamlit_app.py
 import streamlit as st
 import pandas as pd
 import io
 from PIL import Image
 import base64
 import os
-import glob
-
 
 def main():
     st.set_page_config(page_title="Org ID to Name CSV Converter", page_icon="📄", layout="centered")
@@ -23,14 +22,6 @@ def main():
             }}
             h2, p {{
                 animation: fadeInDown 1s ease-in-out;
-            }}
-            .stButton small-btn button {{
-                background-color: #4CAF50;
-                color: white;
-                border-radius: 6px;
-                padding: 4px 10px;
-                font-weight: bold;
-                font-size: 0.8rem;
             }}
             .stButton button {{
                 background-color: #4CAF50;
@@ -68,29 +59,10 @@ def main():
     display_banner()
 
     st.markdown(f"<h2 style='color:{font_color}; font-weight:600;'>Org ID to Name CSV Converter</h2>", unsafe_allow_html=True)
-    st.markdown(f"<p style='color:{font_color};'>Upload the Org Mapping file and either use the latest downloaded Scan Report or upload one manually.</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:{font_color};'>Upload the Org Mapping file and the Scan Report manually below.</p>", unsafe_allow_html=True)
 
     org_map_file = st.file_uploader("Upload Org Mapping CSV", type="csv")
-    use_latest_file = st.checkbox("Use latest downloaded Scan Report")
-    scan_data_file = None
-
-    download_dir = os.path.expanduser("~/Downloads")
-    if use_latest_file:
-        download_dir = st.text_input("Path to your Downloads folder", value=download_dir)
-        if os.path.exists(download_dir):
-            pattern = os.path.join(download_dir, "Scan-2621196-*.csv")
-            matching_files = sorted(glob.glob(pattern), reverse=True)
-            if matching_files:
-                scan_data_file = matching_files[0]
-                st.success(f"Using: {os.path.basename(scan_data_file)}")
-            else:
-                st.warning("No matching Scan Report file found in the specified Downloads folder.")
-        else:
-            st.warning("Specified Downloads folder path does not exist.")
-    else:
-        uploaded_file = st.file_uploader("Upload Scan Report CSV (with org_id)", type="csv")
-        if uploaded_file is not None:
-            scan_data_file = uploaded_file
+    scan_data_file = st.file_uploader("Upload Scan Report CSV (with org_id)", type="csv")
 
     output_filename = st.text_input("Enter output file name (without extension)", value="LongScansReport")
 
@@ -119,7 +91,7 @@ def main():
             df_scan.to_csv(csv_buffer, index=False)
             csv_bytes = csv_buffer.getvalue().encode("utf-8")
 
-            file_display = os.path.basename(scan_data_file.name) if hasattr(scan_data_file, 'name') else os.path.basename(scan_data_file)
+            file_display = os.path.basename(scan_data_file.name) if hasattr(scan_data_file, 'name') else "uploaded_scan_report.csv"
             st.success(f"CSV conversion successful using: {file_display}")
             st.download_button(
                 label="Download Converted CSV",
