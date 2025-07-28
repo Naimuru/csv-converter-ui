@@ -77,13 +77,15 @@ def main():
 
     if use_latest_file:
         download_dir = st.text_input("Path to your Downloads folder", value=os.path.expanduser("~/Downloads"))
-        pattern = os.path.join(download_dir, "Scan-2621196-*.csv")
-        matching_files = sorted(glob.glob(pattern), reverse=True)
-        if matching_files:
-            scan_data_file = matching_files[0]
-            st.success(f"Using: {os.path.basename(scan_data_file)}")
-        else:
-            st.warning("No matching Scan Report file found in the specified Downloads folder.")
+        apply_button = st.button("Apply Downloads Folder Path")
+        if apply_button:
+            pattern = os.path.join(download_dir, "Scan-2621196-*.csv")
+            matching_files = sorted(glob.glob(pattern), reverse=True)
+            if matching_files:
+                scan_data_file = matching_files[0]
+                st.success(f"Using: {os.path.basename(scan_data_file)}")
+            else:
+                st.warning("No matching Scan Report file found in the specified Downloads folder.")
     else:
         uploaded_file = st.file_uploader("Upload Scan Report CSV (with org_id)", type="csv")
         if uploaded_file is not None:
